@@ -2,6 +2,7 @@
 package org.cq.contactly.service;
 
 import org.cq.contactly.dto.request.CreateContactRequest;
+import org.cq.contactly.dto.request.UpdateContactRequest;
 import org.cq.contactly.dto.response.ContactResponse;
 
 import java.util.List;
@@ -15,10 +16,7 @@ public interface ContactService {
 
     List<ContactResponse> getAllContacts();
 
-    ContactResponse updateContact(
-            UUID id,
-            CreateContactRequest request
-    );
+    ContactResponse updateContact(UUID id, UpdateContactRequest request);
 
     void deleteContact(UUID id);
 }
