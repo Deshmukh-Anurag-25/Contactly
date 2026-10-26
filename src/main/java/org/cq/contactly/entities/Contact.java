@@ -49,7 +49,7 @@ public class Contact {
     @Column(length = 20)
     private String postalCode;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 2000)
     private String notes;
 
     @Column(nullable = false)

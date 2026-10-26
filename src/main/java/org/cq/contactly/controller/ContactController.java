@@ -1,6 +1,7 @@
 package org.cq.contactly.controller;
 
 import org.cq.contactly.dto.request.CreateContactRequest;
+import org.cq.contactly.dto.request.UpdateContactRequest;
 import org.cq.contactly.dto.response.ContactResponse;
 import org.cq.contactly.service.ContactService;
 
@@ -49,14 +50,12 @@ public class ContactController {
         return ResponseEntity.ok(contacts);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ContactResponse> updateContact(
             @PathVariable UUID id,
-            @Valid @RequestBody CreateContactRequest request
+            @Valid @RequestBody UpdateContactRequest request
     ) {
-        ContactResponse response = contactService.updateContact(id, request);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(contactService.updateContact(id, request));
     }
 
     @DeleteMapping("/{id}")

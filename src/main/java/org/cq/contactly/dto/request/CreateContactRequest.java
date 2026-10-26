@@ -46,5 +46,6 @@ public class CreateContactRequest {
     @Size(max = 20, message = "Postal code must not exceed 20 characters")
     private String postalCode;
 
+    @Size(max = 2000, message = "Notes must not exceed 2000 characters")
     private String notes;
 }
