@@ -4,6 +4,7 @@ import org.cq.contactly.dto.request.CreateContactRequest;
 import org.cq.contactly.dto.request.UpdateContactRequest;
 import org.cq.contactly.dto.response.ContactResponse;
 import org.cq.contactly.entities.Contact;
+import org.cq.contactly.exception.DuplicateResourceException;
 import org.cq.contactly.exception.ResourceNotFoundException;
 import org.cq.contactly.mapper.ContactMapper;
 import org.cq.contactly.repository.ContactRepository;
@@ -15,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -33,9 +36,22 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public ContactResponse createContact(CreateContactRequest request) {
+        if (hasText(request.getEmail()) && contactRepository.existsByEmailIgnoreCase(request.getEmail().trim())) {
+            throw new DuplicateResourceException("A contact with this email already exists");
+        }
         Contact contact = contactMapper.toEntity(request);
-        Contact savedContact = contactRepository.save(contact);
-        return contactMapper.toResponse(savedContact);
+        return contactMapper.toResponse(contactRepository.save(contact));
+    }
+
+    @Override
+    public ContactResponse updateContact(UUID id, UpdateContactRequest request) {
+        Contact contact = findContactOrThrow(id);
+        if (hasText(request.getEmail())
+                && contactRepository.existsByEmailIgnoreCaseAndIdNot(request.getEmail().trim(), id)) {
+            throw new DuplicateResourceException("A contact with this email already exists");
+        }
+        contactMapper.updateEntity(request, contact);
+        return contactMapper.toResponse(contact);
     }
 
     @Override
@@ -52,14 +68,7 @@ public class ContactServiceImpl implements ContactService {
                 .map(contactMapper::toResponse)
                 .toList();
     }
-
-    @Override
-    public ContactResponse updateContact(UUID id, UpdateContactRequest request) {
-        Contact contact = findContactOrThrow(id);
-        contactMapper.updateEntity(request, contact);
-        return contactMapper.toResponse(contact);
-    }
-
+    
     @Override
     public void deleteContact(UUID id) {
         contactRepository.delete(findContactOrThrow(id));
